@@ -1,0 +1,54 @@
+# docker compose up -d
+# docker compose run --rm app
+
+services:
+  mongo:
+    image: mongo:8
+    container_name: chat_mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+    volumes:
+      - mongo_data:/data/db
+      - ./init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test:
+        - CMD
+        - mongosh
+        - --quiet
+        - -u
+        - admin
+        - -p
+        - admin123
+        - --authenticationDatabase
+        - admin
+        - --eval
+        - db.adminCommand('ping').ok
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  app:
+    build: ./client
+    profiles: ["app"]
+    container_name: chat_app
+    restart: "no"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      MONGODB_URI: mongodb://admin:admin123@mongo:27017/?authSource=admin
+      MONGODB_DB: chat
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./client/app.py:/app/app.py:ro
+      - ./client/modelos.py:/app/modelos.py:ro
+
+volumes:
+  mongo_data:
+  
