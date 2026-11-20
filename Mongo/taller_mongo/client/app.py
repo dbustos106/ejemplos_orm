@@ -1,5 +1,7 @@
-# python app.py
+"""Aplicación de consola para modificar la base de datos del chat usando un ODM.
 
+Uso:  python app.py
+"""
 import os
 
 from dotenv import load_dotenv
