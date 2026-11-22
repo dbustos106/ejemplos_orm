@@ -1,0 +1,16 @@
+# Opcional: servidor Neo4j local 
+services:
+  neo4j:
+    image: neo4j:5-community
+    container_name: taller_neo4j
+    restart: unless-stopped
+    ports:
+      - "7474:7474"   # Neo4j Browser (http://localhost:7474)
+      - "7687:7687"   # protocolo Bolt (para el script de Python)
+    environment:
+      NEO4J_AUTH: neo4j/clave12345
+    volumes:
+      - neo4j_data:/data
+
+volumes:
+  neo4j_data:
